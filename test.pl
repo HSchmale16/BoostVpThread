@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 $ITER = 1000.0; # Iterations for the benchmark
 
+system("rm -r *.o *thread");
+
 # build prog
 @p = Bench("pthread", $ITER);
 @b = Bench("bthread", $ITER);
