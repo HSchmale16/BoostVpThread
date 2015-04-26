@@ -50,8 +50,8 @@ int main(){
     }
     for(int j = 0; j < 100; j++){
         pthread_join(threads[j], NULL);
-        printf("%d  ->   %fX^2 + %fX + %f = %f\n",data[j].id, data[j].c2, data[j].c1,
-               data[j].c0, intergrals[j]);
+        printf("%d  ->   %fX^2 + %fX + %f = %f\n",data[j].id, data[j].c2,
+            data[j].c1, data[j].c0, intergrals[j]);
     }
     return 0;
 }
