@@ -18,7 +18,7 @@ print  "\n  --- PThreads ---\n";
 printf("Binary Size   = %d\n", $psz);
 printf("total runtime = %f\n", $pdt);
 $pdt = $pdt / $ITER;
-printf("avg runtime   = %f\n", $pdt);
+printf("avg runtime   = %f\n\n", $pdt);
 
 # bench bthread
 $bdt = 0; # bthread delta t
@@ -30,11 +30,11 @@ for($a = 0; $a < $ITER; $a++) {
     $bdt += $out;
 }
 
-print  "\n  --- Boost Threads ---\n";
+print  "  --- Boost Threads ---\n";
 printf("Binary Size   = %d\n", $bsz);
 printf("total runtime = %f\n", $bdt);
 $bdt = $bdt / $ITER;
-printf("avg runtime   = %f\n", $bdt);
+printf("avg runtime   = %f\n\n", $bdt);
 
 # determine the winner
 $pwin = 0;
@@ -42,19 +42,27 @@ $bwin = 0;
 # Average Execuation Time
 if($pdt > $bdt){
     print("Boost Threads are faster\n");
-    bwin += 1;
+    $bwin += 1;
 }else{
     print("pthreads are faster\n");
-    pwin += 1;
+    $pwin += 1;
 }
 
 # Binary Size
 if($psz < $bsz){
     print("pthread binary size is smaller");
-    pwin += 1;
+    $pwin += 1;
 }else{
     print("boost thread binary is smaller");
-    bwin += 1;
+    $bwin += 1;
+}
+
+# Tally the totals
+printf("\nboost: %d  | pthread: %d\n", $bwin, $pwin);
+if($bwin > $pwin){
+    print("Boost threads are better\n");
+}else{
+    print("Pthreads are better\n");
 }
 
 # Perform Clean-up
