@@ -2,8 +2,6 @@
 $ITER = 1000.0; # Iterations for the benchmark
 
 # build prog
-system("sh -c make > /dev/null");
-
 @p = Bench("pthread", $ITER);
 @b = Bench("bthread", $ITER);
 
@@ -32,7 +30,7 @@ printf("\nFinal Winner: %s\n", $w);
 
 
 # Perform Clean-up
-system("rm junk");
+system("rm junk*");
 system("sh -c make clean > /dev/null");
 
 # ---- Subroutines ----
@@ -41,10 +39,13 @@ system("sh -c make clean > /dev/null");
 # Accepts a binary name to execute returns points for the win
 sub Bench{
     local $ITER   = $_[1];
+    local $buildT = `{ time make $_[0] > /dev/null ; } 2> junk ; head -2 junk | tail -1`;
     local $sz     = `wc --bytes $_[0]`;
     local $dt_sys = 0;
     local $dt_usr = 0;
     local $dt_rea = 0;
+    
+    $buildT =~s/[^.0-9]//g;
     for($a = 0; $a < $ITER; $a++) {
         system("{ time ./$_[0] > /dev/null ; } 2> junk");
         # Real
@@ -61,16 +62,17 @@ sub Bench{
         $dt_sys += $out;
     }
     print  "\n  --- $_[0] ---\n";
-    printf("Bin Size = %d bytes\n\n", $sz);
-    printf("tot Real = %f sec\n", $dt_rea);    
-    printf("tot User = %f sec\n", $dt_usr);
-    printf("tot Sys  = %f sec\n\n", $dt_sys);
+    printf("Make Time = %f sec\n\n", $buildT);
+    printf("Bin Size  = %d bytes\n\n", $sz);
+    printf("tot Real  = %f sec\n", $dt_rea);    
+    printf("tot User  = %f sec\n", $dt_usr);
+    printf("tot Sys   = %f sec\n\n", $dt_sys);
     local $at_rea = $dt_rea / $ITER;
     local $at_usr = $dt_usr / $ITER;
     local $at_sys = $dt_sys / $ITER;
-    printf("avg Real = %f sec\n", $at_rea);
-    printf("avg User = %f sec\n", $at_usr);
-    printf("avg Sys  = %f sec\n", $at_sys);
-    @res = ($sz, $dt_sys, $dt_usr, $dt_rea, $at_sys, $at_usr, $at_rea);
+    printf("avg Real  = %f sec\n", $at_rea);
+    printf("avg User  = %f sec\n", $at_usr);
+    printf("avg Sys   = %f sec\n", $at_sys);
+    @res = ($buildT, $sz, $dt_sys, $dt_usr, $dt_rea, $at_sys, $at_usr, $at_rea);
     return @res;
 }
