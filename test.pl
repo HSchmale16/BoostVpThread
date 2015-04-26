@@ -1,70 +1,50 @@
 #!/usr/bin/perl
-$ITER = 5000.0; # Iterations for the benchmark
+$ITER = 50.0; # Iterations for the benchmark
 
 # build prog
 system("sh -c make > /dev/null");
 
-# benchmark pthread
-$pdt = 0; # pthread delta t
-$psz = `wc --bytes pthread`;
-for($a = 0; $a < $ITER; $a++) {
-    system("{ time ./pthread > /dev/null ; } 2> junk");
-    my $out = `tail -1 junk`;
-    $out=~s/[^.0-9]//g;
-    $pdt += $out;
-}
-
-print  "\n  --- PThreads ---\n";
-printf("Binary Size   = %d\n", $psz);
-printf("total runtime = %f\n", $pdt);
-$pdt = $pdt / $ITER;
-printf("avg runtime   = %f\n\n", $pdt);
-
-# bench bthread
-$bdt = 0; # bthread delta t
-$bsz = `wc --bytes bthread`;
-for($a = 0; $a < $ITER; $a++) {
-    system("{ time ./bthread > /dev/null ; } 2> junk");
-    my $out = `tail -1 junk`;
-    $out=~s/[^.0-9]//g;
-    $bdt += $out;
-}
-
-print  "  --- Boost Threads ---\n";
-printf("Binary Size   = %d\n", $bsz);
-printf("total runtime = %f\n", $bdt);
-$bdt = $bdt / $ITER;
-printf("avg runtime   = %f\n\n", $bdt);
-
-# determine the winner
-$pwin = 0;
-$bwin = 0;
-# Average Execuation Time
-if($pdt > $bdt){
-    print("Boost Threads are faster\n");
-    $bwin += 1;
-}else{
-    print("pthreads are faster\n");
-    $pwin += 1;
-}
-
-# Binary Size
-if($psz < $bsz){
-    print("pthread binary size is smaller");
-    $pwin += 1;
-}else{
-    print("boost thread binary is smaller");
-    $bwin += 1;
-}
-
-# Tally the totals
-printf("\nboost: %d  | pthread: %d\n", $bwin, $pwin);
-if($bwin > $pwin){
-    print("Boost threads are better\n");
-}else{
-    print("Pthreads are better\n");
-}
+Bench("pthread", $ITER);
+Bench("bthread", $ITER);
 
 # Perform Clean-up
-system("rm junk");
+# system("rm junk");
 system("sh -c make clean > /dev/null");
+
+# ---- Subroutines ----
+
+# bench mark
+# Accepts a binary name to execute returns points for the win
+sub Bench{
+    local $ITER   = $_[1];
+    local $sz     = `wc --bytes $_[0]`;
+    local $dt_sys = 0;
+    local $dt_usr = 0;
+    local $dt_rea = 0;
+    for($a = 0; $a < $ITER; $a++) {
+        system("{ time ./$_[0] > /dev/null ; } 2> junk");
+        # Real
+        my $out = `head -2 junk | tail -1`;
+        $out=~s/[^.0-9]//g;
+        $dt_rea += $out;
+        # User
+        my $out = `tail -2 junk | head -1`;
+        $out=~s/[^.0-9]//g;
+        $dt_usr += $out;
+        # Sys
+        my $out = `tail -1 junk`;
+        $out=~s/[^.0-9]//g;
+        $dt_sys += $out;
+    }
+    print  "\n  --- $_[0] ---\n";
+    printf("Bin Size = %d\n\n", $sz);
+    printf("tot Real = %f\n", $dt_rea);    
+    printf("tot User = %f\n", $dt_usr);
+    printf("tot Sys  = %f\n", $dt_sys);
+    $dt_rea /= $ITER;
+    $dt_usr /= $ITER;
+    $dt_sts /= $ITER;
+    printf("avg Real = %f\n", $dt_rea);
+    printf("avg User = %f\n", $dt_usr);
+    printf("avg Sys  = %f\n", $dt_sys);
+}
