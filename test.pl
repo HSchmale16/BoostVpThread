@@ -38,3 +38,7 @@ if($pdt > $bdt){
 }else{
     print("pthreads are faster\n");
 }
+
+# Perform Clean-up
+system("rm junk");
+system("sh -c make clean > /dev/null");

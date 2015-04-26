@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <cmath>
 
-const double DX = .01;
+const double DX = .001;
 double intergrals[100];
 
 struct tData{
