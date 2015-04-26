@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$ITER = 50; # Iterations for the benchmark
+$ITER = 500; # Iterations for the benchmark
 
 # build prog
 system("sh -c make > /dev/null");
@@ -28,3 +28,9 @@ $bdt = $bdt / $ITER;
 printf("pthread avg runtime = %f\n", $pdt);
 printf("boost thread avg    = %f\n", $bdt);
 
+# determine the winner
+if($pdt > $bdt){
+    print("Boost Threads are faster\n");
+}else{
+    print("pthreads are faster\n");
+}
