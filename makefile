@@ -6,4 +6,6 @@ bthread:
 pthread: 
 	g++ pthread.cpp -o $@ -lpthread
 
-
+.PHONY: clean
+clean:
+	rm pthread bthread
