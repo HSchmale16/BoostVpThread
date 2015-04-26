@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$ITER = 500; # Iterations for the benchmark
+$ITER = 5000; # Iterations for the benchmark
 
 # build prog
 system("sh -c make > /dev/null");
@@ -12,7 +12,11 @@ for($a = 0; $a < $ITER; $a++) {
     $out=~s/[^.0-9]//g;
     $pdt += $out;
 }
+
+print  "  --- PThreads ---\n";
+printf("total runtime = %f\n", $pdt);
 $pdt = $pdt / $ITER;
+printf("avg runtime   = %f\n", $pdt);
 
 # bench bthread
 $bdt = 0; # bthread delta t
@@ -22,11 +26,11 @@ for($a = 0; $a < $ITER; $a++) {
     $out=~s/[^.0-9]//g;
     $bdt += $out;
 }
-$bdt = $bdt / $ITER;
 
-# output the results whatever they may be
-printf("pthread avg runtime = %f\n", $pdt);
-printf("boost thread avg    = %f\n", $bdt);
+print  "  --- Boost Threads ---\n";
+printf("total runtime = %f\n", $bdt);
+$bdt = $bdt / $ITER;
+printf("avg runtime   = %f\n", $bdt);
 
 # determine the winner
 if($pdt > $bdt){
