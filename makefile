@@ -12,9 +12,11 @@ all: $(BOOST_EXE) $(PTHREAD_EXE)
 
 $(BOOST_EXE): $(BOOST_EXE).o
 	g++ $^ -o $@ -lboost_thread
+	strip -s $@
 
 $(PTHREAD_EXE): $(PTHREAD_EXE).o
 	g++ $^ -o $@ -lpthread
+	strip -s $@
 
 clean:
 	rm -rf *.o
